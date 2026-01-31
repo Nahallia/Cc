@@ -1,0 +1,102 @@
+local Env = getgenv().PL_Hub
+if not Env then return warn("Load main hub first!") end
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+if not Env.cfg.vehicle then
+    Env.cfg.vehicle = {
+        enabled = false,
+        maxSpeed = 100,
+        turnSpeed = 2,
+        torque = 100,
+        steerFloat = 1,
+    }
+end
+
+local currentVehicle = nil
+local originalVehicleStats = {}
+local vehicleConnection = nil
+
+local function findVehicle()
+    local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+    if humanoid and humanoid.SeatPart and humanoid.SeatPart:IsA("VehicleSeat") then
+        return humanoid.SeatPart
+    end
+    return nil
+end
+
+local function applyVehicleMods(vehicle)
+    if not vehicle or not Env.cfg.vehicle.enabled then return end
+    
+    if not originalVehicleStats[vehicle] then
+        originalVehicleStats[vehicle] = {
+            MaxSpeed = vehicle.MaxSpeed,
+            TurnSpeed = vehicle.TurnSpeed,
+            Torque = vehicle.Torque,
+            Steer = vehicle.Steer
+        }
+    end
+    
+    vehicle.MaxSpeed = Env.cfg.vehicle.maxSpeed
+    vehicle.TurnSpeed = Env.cfg.vehicle.turnSpeed
+    vehicle.Torque = Env.cfg.vehicle.torque
+    vehicle.Steer = Env.cfg.vehicle.steerFloat
+end
+
+local function stopVehicleMonitoring()
+    if vehicleConnection then
+        vehicleConnection:Disconnect()
+        vehicleConnection = nil
+    end
+    
+    if currentVehicle and originalVehicleStats[currentVehicle] then
+        local stats = originalVehicleStats[currentVehicle]
+        pcall(function()
+            currentVehicle.MaxSpeed = stats.MaxSpeed
+            currentVehicle.TurnSpeed = stats.TurnSpeed
+            currentVehicle.Torque = stats.Torque
+            currentVehicle.Steer = stats.Steer
+        end)
+    end
+    
+    currentVehicle = nil
+end
+
+local function startVehicleMonitoring()
+    if vehicleConnection then
+        vehicleConnection:Disconnect()
+    end
+    
+    vehicleConnection = RunService.Heartbeat:Connect(function()
+        local vehicle = findVehicle()
+        
+        if vehicle ~= currentVehicle then
+            currentVehicle = vehicle
+            if vehicle then
+                applyVehicleMods(vehicle)
+            end
+        end
+        
+        if currentVehicle then
+            applyVehicleMods(currentVehicle)
+        end
+    end)
+end
+
+LocalPlayer.CharacterAdded:Connect(function(char)
+    if Env.cfg.vehicle and Env.cfg.vehicle.enabled then
+        task.wait(1)
+        startVehicleMonitoring()
+    end
+end)
+
+if Env.cfg.vehicle and Env.cfg.vehicle.enabled then
+    startVehicleMonitoring()
+end
+
+getgenv().startVehicleMonitoring = startVehicleMonitoring
+getgenv().stopVehicleMonitoring = stopVehicleMonitoring
+getgenv().getCurrentVehicle = function() return currentVehicle end
