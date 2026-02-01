@@ -1355,7 +1355,7 @@ UtilityTab:CreateButton({
         local player = Players.LocalPlayer
 
         if queue_on_teleport then
-            queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Nahalliaa/Cc/main/Main"))()]])
+            queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Nahallia/Cc/refs/heads/main/P3.luau"))()]])
         end
 
         TeleportService:TeleportToPlaceInstance(
@@ -1384,7 +1384,7 @@ UtilityTab:CreateToggle({
 
         local function rejoin()
             if queue_on_teleport then
-                queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Nahalliaa/Cc/main/Main"))()]])
+                queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Nahallia/Cc/refs/heads/main/P3.luau"))()]])
             end
             TeleportService:TeleportToPlaceInstance(placeId, jobId, player)
         end
@@ -1419,7 +1419,7 @@ UtilityTab:CreateButton({
         local player = Players.LocalPlayer
 
         if queue_on_teleport then
-            queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Nahalliaa/Cc/main/Main"))()]])
+            queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Nahallia/Cc/refs/heads/main/P3.luau"))()]])
         end
 
         TeleportService:Teleport(game.PlaceId, player)
