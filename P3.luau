@@ -1344,6 +1344,87 @@ UtilityTab:CreateToggle({
         Env.cfg.autograb = v
     end,
 })
+
+UtilityTab:CreateSection('Server')
+UtilityTab:CreateButton({
+    Name = "Rejoin",
+    Callback = function()
+        local Players = game:GetService("Players")
+        local TeleportService = game:GetService("TeleportService")
+
+        local player = Players.LocalPlayer
+
+        if queue_on_teleport then
+            queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Nahalliaa/Cc/main/Main"))()]])
+        end
+
+        TeleportService:TeleportToPlaceInstance(
+            game.PlaceId,
+            game.JobId,
+            player
+        )
+    end,
+})
+
+UtilityTab:CreateToggle({
+    Name = "Auto Rejoin (IsBadGuard)",
+    CurrentValue = false,
+    Flag = "AutoRejoinBadGuard",
+    Callback = function(state)
+        local Players = game:GetService("Players")
+        local TeleportService = game:GetService("TeleportService")
+
+        local player = Players.LocalPlayer
+        local placeId = game.PlaceId
+        local jobId = game.JobId
+
+        if not getgenv().BadGuardConnection then
+            getgenv().BadGuardConnection = nil
+        end
+
+        local function rejoin()
+            if queue_on_teleport then
+                queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Nahalliaa/Cc/main/Main"))()]])
+            end
+            TeleportService:TeleportToPlaceInstance(placeId, jobId, player)
+        end
+
+        if state then
+            if player:GetAttribute("IsBadGuard") == true then
+                rejoin()
+                return
+            end
+
+            getgenv().BadGuardConnection =
+                player:GetAttributeChangedSignal("IsBadGuard"):Connect(function()
+                    if player:GetAttribute("IsBadGuard") == true then
+                        rejoin()
+                    end
+                end)
+        else
+            if getgenv().BadGuardConnection then
+                getgenv().BadGuardConnection:Disconnect()
+                getgenv().BadGuardConnection = nil
+            end
+        end
+    end,
+})
+
+UtilityTab:CreateButton({
+    Name = "Server Hop",
+    Callback = function()
+        local Players = game:GetService("Players")
+        local TeleportService = game:GetService("TeleportService")
+
+        local player = Players.LocalPlayer
+
+        if queue_on_teleport then
+            queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Nahalliaa/Cc/main/Main"))()]])
+        end
+
+        TeleportService:Teleport(game.PlaceId, player)
+    end,
+})
 ConfigTab:CreateSection('Configuration Manager')
 
 local configNameInput = ''
